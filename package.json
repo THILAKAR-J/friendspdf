@@ -1,0 +1,21 @@
+{
+  "name": "friendspdf",
+  "version": "1.0.0",
+  "description": "Free PDF tools that run in the browser: friendspdf.com",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:preview": "INDEXING=off BASE_PATH=/friendspdf/ node build.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node tests/e2e.cjs"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@fontsource/plus-jakarta-sans": "^5.1.1",
+    "fflate": "^0.8.2",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38",
+    "sortablejs": "^1.15.6"
+  },
+  "private": true,
+  "type": "module"
+}
