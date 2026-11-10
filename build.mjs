@@ -1,19 +1,26 @@
 // Static site generator: node build.mjs  -> dist/
 // Env: INDEXING=off (adds noindex + robots Disallow, for previews), BASE_PATH=/friendspdf/ (only used by 404.html).
+// On Cloudflare Pages (CF_PAGES_BRANCH is set) only the main branch is indexable; every other branch is a noindex preview.
+// Admin edits live in data/content.json and are applied here (see src/lib/content.mjs).
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { SITE, TOOL_PAGES } from './src/site.mjs';
 import { layout } from './src/templates.mjs';
+import { EMPTY, applyPage, defaultsOf, validateContent } from './src/lib/content.mjs';
 import { homePage, toolsPage, toolPage, examPage, guidePage, recentPage, privacyPage, termsPage, notFoundPage } from './src/pages.mjs';
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
 const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
 const NM = path.join(ROOT, 'node_modules');
-const INDEXING = process.env.INDEXING !== 'off';
+const BRANCH = process.env.CF_PAGES_BRANCH || process.env.GITHUB_REF_NAME || 'local';
+const INDEXING = process.env.INDEXING ? process.env.INDEXING !== 'off' : !(process.env.CF_PAGES_BRANCH && process.env.CF_PAGES_BRANCH !== 'main');
 const BASE = process.env.BASE_PATH || '/';
 const TODAY = new Date().toISOString().slice(0, 10);
+const CONTENT_FILE = path.join(ROOT, 'data', 'content.json');
+const content = fs.existsSync(CONTENT_FILE) ? { ...EMPTY, ...JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8')) } : { ...EMPTY };
+content.pages = content.pages || {};
 
 const copy = (from, to) => { fs.mkdirSync(path.dirname(to), { recursive: true }); fs.copyFileSync(from, to); };
 const copyDir = (from, to, filter = () => true) => {
@@ -30,6 +37,7 @@ fs.mkdirSync(DIST, { recursive: true });
 
 // ---- assets ----
 copyDir(path.join(SRC, 'assets'), path.join(DIST, 'assets'));
+copyDir(path.join(SRC, 'admin'), path.join(DIST, 'admin')); // the /admin/ panel (it talks to functions/admin/api)
 const V = path.join(DIST, 'assets', 'vendor');
 copy(path.join(NM, 'pdf-lib/dist/pdf-lib.esm.min.js'), path.join(V, 'pdf-lib.esm.min.js'));
 copy(path.join(NM, 'pdfjs-dist/legacy/build/pdf.min.mjs'), path.join(V, 'pdfjs/pdf.min.mjs'));
@@ -52,12 +60,9 @@ for (const f of assetFiles.sort()) hash.update(fs.readFileSync(f));
 const assetV = hash.digest('hex').slice(0, 10);
 
 // ---- pages ----
-const pages = [];
-const emit = (def, rel, file) => {
-  const html = layout({ ...def, rel, assetV, indexing: INDEXING && !def.noindex });
-  write(file, html);
-  pages.push({ file, path: def.page.path, noindex: !!def.noindex });
-};
+// Every page is built first, then the admin edits are checked and applied, then the HTML is written.
+const queue = [];
+const emit = (def, rel, file) => queue.push({ def, rel, file, path: '/' + def.page.path });
 emit(homePage('./'), './', 'index.html');
 emit(toolsPage('../'), '../', 'tools/index.html');
 for (const tp of TOOL_PAGES) emit(toolPage(tp), '../', `${tp.slug}/index.html`);
@@ -67,6 +72,22 @@ emit(recentPage('../'), '../', 'recent/index.html');
 emit(privacyPage('../'), '../', 'privacy/index.html');
 emit(termsPage('../'), '../', 'terms/index.html');
 emit(notFoundPage(BASE), BASE, '404.html');
+
+const problems = validateContent(content, queue.filter((q) => q.file !== '404.html'));
+if (problems.length) { console.error('data/content.json has problems, nothing was built:\n  ' + problems.join('\n  ')); process.exit(1); }
+
+const pages = [];
+const adminPages = [];
+for (const q of queue) {
+  const ov = q.file === '404.html' ? {} : content.pages[q.path] || {};
+  const def = applyPage(q.def, ov);
+  const html = layout({ ...def, rel: q.rel, assetV, indexing: INDEXING && !def.noindex });
+  write(q.file, html);
+  pages.push({ file: q.file, path: def.page.path, noindex: !!def.noindex });
+  if (q.file !== '404.html') adminPages.push({ path: q.path, defaults: defaultsOf(q.def), override: ov, inSitemap: INDEXING && !def.noindex });
+}
+// What the admin panel reads: every page's default text and current edits.
+write('admin/pages.json', JSON.stringify({ builtAt: new Date().toISOString(), branch: BRANCH, siteUrl: SITE.url, indexable: INDEXING, pages: adminPages }));
 
 // ---- PWA ----
 write('manifest.webmanifest', JSON.stringify({
@@ -102,7 +123,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin !== location.origin) return;
+  if (url.origin !== location.origin || url.pathname.includes('/admin/')) return;
   if (req.mode === 'navigate') {
     // Network first so updates appear quickly; cached page when offline.
     e.respondWith(fetch(req).then((res) => { const copy = res.clone(); if (res.ok) caches.open(CACHE).then((c) => c.put(req, copy)); return res; })
@@ -123,11 +144,14 @@ write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 ${indexable.map((p) => `  <url><loc>${SITE.url}/${p.path}</loc><lastmod>${TODAY}</lastmod></url>`).join('\n')}
 </urlset>
 `);
-write('robots.txt', INDEXING ? `User-agent: *\nAllow: /\nDisallow: /recent/\n\nSitemap: ${SITE.url}/sitemap.xml\n` : 'User-agent: *\nDisallow: /\n');
+write('robots.txt', INDEXING ? `User-agent: *\nAllow: /\nDisallow: /recent/\nDisallow: /admin/\n\nSitemap: ${SITE.url}/sitemap.xml\n` : 'User-agent: *\nDisallow: /\n');
 copy(path.join(SRC, 'assets/img/favicon.ico'), path.join(DIST, 'favicon.ico'));
 write('.nojekyll', '');
 // Security headers for Cloudflare Pages / Netlify (GitHub Pages ignores this file).
-write('_headers', `/*
+write('_headers', `/admin/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+/*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

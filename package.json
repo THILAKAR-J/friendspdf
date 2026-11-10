@@ -6,7 +6,9 @@
     "build": "node build.mjs",
     "build:preview": "INDEXING=off BASE_PATH=/friendspdf/ node build.mjs",
     "serve": "node scripts/serve.mjs",
-    "test": "node tests/e2e.cjs"
+    "test": "node tests/e2e.cjs",
+    "build:cf": "node build.mjs",
+    "admin": "node build.mjs && node scripts/admin-dev.mjs"
   },
   "license": "UNLICENSED",
   "dependencies": {
