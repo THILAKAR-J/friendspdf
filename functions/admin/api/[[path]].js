@@ -80,8 +80,9 @@ function checkContent(c) {
   for (const [path, p] of Object.entries(pages)) {
     if (!/^\/[a-z0-9\-\/]*$/.test(path) || (path !== '/' && !path.endsWith('/'))) return `Bad page address: ${path}`;
     if (!p || typeof p !== 'object' || Array.isArray(p)) return `${path}: edits must be an object`;
-    for (const k of Object.keys(p)) if (!['title', 'description', 'h1', 'extra', 'faq', 'noindex'].includes(k)) return `${path}: unknown field ${k}`;
+    for (const k of Object.keys(p)) if (!['title', 'description', 'keywords', 'h1', 'extra', 'faq', 'noindex'].includes(k)) return `${path}: unknown field ${k}`;
     for (const k of ['title', 'description', 'h1']) if (p[k] !== undefined && (typeof p[k] !== 'string' || p[k].length > 300)) return `${path}: ${k} must be text under 300 characters`;
+    if (p.keywords !== undefined && (typeof p.keywords !== 'string' || p.keywords.length > 500)) return `${path}: keywords must be text under 500 characters`;
     if (p.extra !== undefined && (typeof p.extra !== 'string' || p.extra.length > 20000)) return `${path}: extra text is too long`;
     if (p.faq !== undefined && (!Array.isArray(p.faq) || p.faq.length > 20 || p.faq.some((f) => !f || typeof f.q !== 'string' || typeof f.a !== 'string' || f.q.length > 300 || f.a.length > 3000))) return `${path}: FAQ must be up to 20 questions with answers`;
     if (p.noindex !== undefined && typeof p.noindex !== 'boolean') return `${path}: noindex must be true or false`;

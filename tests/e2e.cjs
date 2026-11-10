@@ -413,8 +413,10 @@ const noErrors = (page) => assert(!page._errors.length, 'console errors: ' + pag
   await test('SEO + layout crawl of every page (3 screen sizes)', async () => {
     const sitemap = await (await fetch(BASE + 'sitemap.xml')).text();
     const urls = [...sitemap.matchAll(/<loc>https:\/\/friendspdf\.com\/(.*?)<\/loc>/g)].map((m) => m[1]);
-    assert(urls.length >= 25, 'sitemap urls ' + urls.length);
-    const all = [...urls, 'recent/'];
+    assert(urls.length >= 22, 'sitemap urls ' + urls.length);
+    const hidden = ['recent/', 'privacy/', 'terms/', 'tools/']; // noindex pages: not in the sitemap, still crawled
+    assert(!urls.some((u) => hidden.includes(u)), 'noindex pages must not be in the sitemap');
+    const all = [...urls, ...hidden];
     const titles = new Map(), descs = new Map();
     const linkSet = new Set();
     const issues = [];
@@ -429,7 +431,7 @@ const noErrors = (page) => assert(!page._errors.length, 'console errors: ' + pag
         if (label === 'mobile' && small.length) issues.push(`${u} small tap targets: ${small.slice(0, 4).join(', ')}`);
         if (label === 'desktop') {
           const m = await page.evaluate(() => ({
-            title: document.title, desc: document.querySelector('meta[name=description]')?.content || '',
+            title: document.title, desc: document.querySelector('meta[name=description]')?.content || '', keywords: document.querySelector('meta[name=keywords]')?.content || '',
             canonical: document.querySelector('link[rel=canonical]')?.href, h1: document.querySelectorAll('h1').length, lang: document.documentElement.lang,
             robots: document.querySelector('meta[name=robots]')?.content, og: !!document.querySelector('meta[property="og:title"]') && !!document.querySelector('meta[property="og:image"]'),
             ld: [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => { try { JSON.parse(s.textContent); return true; } catch { return false; } }),
@@ -438,14 +440,15 @@ const noErrors = (page) => assert(!page._errors.length, 'console errors: ' + pag
             headingOrder: [...document.querySelectorAll('h1,h2,h3')].map((h) => +h.tagName[1])
           }));
           if (m.title.length < 20 || m.title.length > 65) issues.push(`${u} title length ${m.title.length}: ${m.title}`);
-          if (m.desc.length < 70 || m.desc.length > 165) issues.push(`${u} description length ${m.desc.length}`);
+          if (m.desc.length < 70 || m.desc.length > 230) issues.push(`${u} description length ${m.desc.length}`);
           if (titles.has(m.title)) issues.push(`${u} duplicate title with ${titles.get(m.title)}`); titles.set(m.title, u);
           if (descs.has(m.desc)) issues.push(`${u} duplicate description with ${descs.get(m.desc)}`); descs.set(m.desc, u);
           if (m.canonical !== 'https://friendspdf.com/' + u) issues.push(`${u} canonical ${m.canonical}`);
           if (m.h1 !== 1) issues.push(`${u} h1 count ${m.h1}`);
           if (m.lang !== 'en') issues.push(`${u} lang`);
-          if (u !== 'recent/' && !/^index/.test(m.robots)) issues.push(`${u} robots ${m.robots}`);
-          if (u === 'recent/' && !/noindex/.test(m.robots)) issues.push('recent should be noindex');
+          if (!hidden.includes(u) && !/^index/.test(m.robots)) issues.push(`${u} robots ${m.robots}`);
+          if (hidden.includes(u) && !/noindex/.test(m.robots)) issues.push(`${u} should be noindex`);
+          if (u === 'merge-pdf/' && !/^Merge PDF,/.test(m.keywords || '')) issues.push('merge-pdf meta keywords missing');
           if (!m.og) issues.push(`${u} og tags`);
           if (m.ld.some((x) => !x)) issues.push(`${u} invalid JSON-LD`);
           if (m.imgsNoAlt) issues.push(`${u} img without alt`);

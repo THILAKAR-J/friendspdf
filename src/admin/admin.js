@@ -38,7 +38,7 @@
   const plain = (s) => String(s || '').replace(/\*\*/g, '');
   function current(p) {
     const d = p.defaults, o = ov(p.path);
-    return { title: o.title != null ? o.title : d.title, description: o.description != null ? o.description : d.description, h1: o.h1 != null ? o.h1 : d.h1, faq: o.faq || d.faq, extra: o.extra || '', noindex: !!o.noindex };
+    return { title: o.title != null ? o.title : d.title, description: o.description != null ? o.description : d.description, keywords: o.keywords != null ? o.keywords : (d.keywords || ''), h1: o.h1 != null ? o.h1 : d.h1, faq: o.faq || d.faq, extra: o.extra || '', noindex: !!o.noindex };
   }
   function setField(path, key, value) {
     const p = pageBy(path), d = p.defaults;
@@ -61,7 +61,7 @@
   function checksFor(p) {
     const c = current(p), out = [], tl = len(c.title), dl = len(c.description);
     out.push(tl < 20 || tl > 78 ? ['err', 'Title is ' + tl + ' characters; keep it between 20 and 65'] : tl > 65 ? ['warn', 'Title is ' + tl + ' characters; Google may cut it after about 65'] : ['ok', 'Title ' + tl + ' characters']);
-    out.push(dl < 70 || dl > 175 ? ['err', 'Description is ' + dl + ' characters; keep it between 70 and 160'] : dl > 160 ? ['warn', 'Description is ' + dl + ' characters; Google may cut it after about 160'] : ['ok', 'Description ' + dl + ' characters']);
+    out.push(dl < 70 || dl > 230 ? ['err', 'Description is ' + dl + ' characters; keep it between 70 and 160'] : dl > 160 ? ['warn', 'Description is ' + dl + ' characters; Google may cut it after about 160'] : ['ok', 'Description ' + dl + ' characters']);
     const dupT = S.pages.some((q) => q !== p && current(q).title.trim() === c.title.trim());
     const dupD = S.pages.some((q) => q !== p && current(q).description.trim() === c.description.trim());
     out.push(dupT || dupD ? ['err', (dupT ? 'Title' : 'Description') + ' is the same as another page'] : ['ok', 'Title and description used by no other page']);
@@ -181,15 +181,17 @@
     const saved = JSON.parse(S.saved).pages || {};
     const list = S.pages.filter((x) => (S.filter === 'All' || x.kind === S.filter) && (!S.q || (labelOf(x) + ' ' + x.path).toLowerCase().indexOf(S.q.toLowerCase()) >= 0))
       .map((x) => { const dirty = JSON.stringify(saved[x.path]) !== JSON.stringify(S.content.pages[x.path]); return '<a class="pitem" href="#page=' + encodeURIComponent(x.path) + '"' + (x.path === p.path ? ' aria-current="page"' : '') + '><b>' + h(labelOf(x)) + '</b><span>' + h(x.path) + (dirty ? ' · draft' : '') + '</span></a>'; }).join('');
+    const kwCount = (v) => String(v || '').split(/[,;\n]/).filter((x) => x.trim()).length;
     const meter = (n, lo, hi, max) => '<div class="meter ' + (n < lo || n > max ? 'err' : n > hi ? 'warn' : '') + '"><i style="width:' + Math.min(100, Math.round(n / hi * 100)) + '%"></i></div>';
     const cnt = (n, lo, hi, max) => '<span class="count num ' + (n < lo || n > max ? 'err' : n > hi ? 'warn' : 'ok') + '">' + n + ' / ' + hi + ' characters</span>';
     const seo = '<section class="card" style="display:flex;flex-direction:column;gap:20px" aria-labelledby="sr"><h2 id="sr">Search result</h2>' +
       '<div class="fld"><div class="fld-h"><label for="f-title">Meta title</label>' + cnt(len(c.title), 20, 65, 78) + '</div><input class="in" id="f-title" data-f="title" value="' + h(c.title) + '">' + meter(len(c.title), 20, 65, 78) + '</div>' +
-      '<div class="fld"><div class="fld-h"><label for="f-description">Meta description</label>' + cnt(len(c.description), 70, 160, 175) + '</div><textarea class="ta" id="f-description" data-f="description" rows="3">' + h(c.description) + '</textarea>' + meter(len(c.description), 70, 160, 175) + '</div>' +
+      '<div class="fld"><div class="fld-h"><label for="f-description">Meta description</label>' + cnt(len(c.description), 70, 160, 230) + '</div><textarea class="ta" id="f-description" data-f="description" rows="3">' + h(c.description) + '</textarea>' + meter(len(c.description), 70, 160, 230) + '</div>' +
+      '<div class="fld"><div class="fld-h"><label for="f-keywords">Meta keywords</label><span class="count num ok">' + kwCount(c.keywords) + ' keywords</span></div><textarea class="ta" id="f-keywords" data-f="keywords" rows="2" placeholder="Merge PDF, PDF Merger, Combine PDF Files Online">' + h(c.keywords) + '</textarea><p class="note">Separate with commas. Google ignores this tag, but some other search engines read it.</p></div>' +
       '<div class="g2"><div class="fld"><label for="f-slug" style="font-size:14px;font-weight:700">Page address</label><input class="in" id="f-slug" value="' + h(p.path) + '" readonly><p class="note">Locked, so old links and rankings keep working.</p></div>' +
       '<div class="fld"><label for="f-canon" style="font-size:14px;font-weight:700">Canonical</label><input class="in" id="f-canon" value="' + h(S.meta.siteUrl + (p.path === '/' ? '/' : p.path)) + '" readonly><p class="note">Set automatically from the address.</p></div></div>' +
       '<label class="chk"><input type="checkbox" data-f="index"' + (c.noindex ? '' : ' checked') + '>Show in Google (index and sitemap)</label>' +
-      '<div><button type="button" class="lnk" data-act="reset" data-keys="title,description,noindex">Reset title, description and indexing to the default</button></div></section>';
+      '<div><button type="button" class="lnk" data-act="reset" data-keys="title,description,keywords,noindex">Reset title, description, keywords and indexing to the default</button></div></section>';
     const text = '<section class="card" style="display:flex;flex-direction:column;gap:16px" aria-labelledby="pt"><h2 id="pt">Page text</h2>' +
       '<div class="fld"><label for="f-h1" style="font-size:14px;font-weight:700">Heading (H1)</label><input class="in" id="f-h1" data-f="h1" value="' + h(c.h1) + '"' + (d.h1Editable ? '' : ' readonly') + '><p class="note">' + (d.h1Editable ? 'Put **two stars** around words that should be highlighted in blue.' : 'This page builds its heading in the browser, so it cannot be edited here.') + '</p></div>' +
       '<div class="fld"><label for="f-extra" style="font-size:14px;font-weight:700">Extra text, shown above the questions</label><div class="toolbar" role="toolbar" aria-label="Text format"><button type="button" data-wrap="strong" aria-label="Bold">B</button><button type="button" data-wrap="em" aria-label="Italic"><i>I</i></button><button type="button" data-wrap="h2">H2</button><button type="button" data-wrap="p">Para</button><button type="button" data-wrap="li">List item</button><button type="button" data-wrap="a">Link</button></div><textarea class="ta mono" id="f-extra" data-f="extra" rows="8" placeholder="&lt;h2&gt;When to use this tool&lt;/h2&gt;&#10;&lt;p&gt;Short, helpful text for your visitors…&lt;/p&gt;">' + h(c.extra) + '</textarea><p class="note">Allowed: headings, paragraphs, lists, bold, italic and links.</p></div>' +

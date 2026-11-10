@@ -127,7 +127,7 @@ export function layout({ page, rel, body, active, tab, scripts = [], jsonld = []
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(page.title)}</title>
 <meta name="description" content="${esc(page.desc)}">
-<meta name="robots" content="${robots}">
+${page.keywords ? `<meta name="keywords" content="${esc(page.keywords)}">\n` : ''}<meta name="robots" content="${robots}">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${SITE.name}">

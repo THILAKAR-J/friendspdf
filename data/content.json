@@ -1,3 +1,97 @@
 {
-  "pages": {}
+  "pages": {
+    "/jpg-to-pdf/": {
+      "title": "Free JPG to PDF Converter Tool",
+      "description": "Convert JPG images to PDF online for free. Upload multiple images, arrange their order, adjust page settings, and download your PDF instantly. No registration required.",
+      "keywords": "JPG to PDF, JPG to PDF Converter, Free JPG to PDF Converter, Convert JPG to PDF Online, Image to PDF Converter"
+    },
+    "/pdf-to-jpg/": {
+      "title": "Free PDF to JPG Converter Tool",
+      "description": "Convert PDF pages to JPG images online for free. Easily extract images from PDF files, choose image quality, and download JPG files instantly. No registration required.",
+      "keywords": "PDF to JPG, PDF to JPG Converter, Free PDF to JPG Converter, Convert PDF to JPG Online, PDF to Image Converter"
+    },
+    "/png-to-pdf/": {
+      "title": "Free PNG to PDF Converter Tool",
+      "description": "Convert PNG images to PDF online for free. Upload multiple PNG files, arrange their order, customize page settings, and download your PDF instantly. No registration required.",
+      "keywords": "PNG to PDF, PNG to PDF Converter, Free PNG to PDF Converter, Convert PNG to PDF Online, PNG Image to PDF"
+    },
+    "/merge-pdf/": {
+      "title": "Free PDF Merger Tool – Merge Multiple PDF Files Online",
+      "description": "Merge multiple PDF files into one document online for free. Easily combine PDFs, arrange file order, and download your merged PDF instantly. No registration required.",
+      "keywords": "Merge PDF, PDF Merger, Free PDF Merger, Combine PDF Files Online, Merge Multiple PDF Files"
+    },
+    "/split-pdf/": {
+      "title": "Free Dismerge PDF Tool – Unmerge PDF Documents Online",
+      "description": "Dismerge PDF files online for free with our easy-to-use tool. Unmerge PDF documents, split PDF documents into separate files, and extract specific pages quickly without installing software.",
+      "keywords": "Dismerge PDF, Unmerge PDF Documents, Split PDF Document, Dismerge PDF Online, Unmerge PDF Files"
+    },
+    "/rotate-pdf/": {
+      "title": "Free Rotate PDF Tool – Rotate PDF Documents Online",
+      "description": "Rotate PDF documents online for free with our easy-to-use tool. Rotate PDF docs clockwise or counterclockwise, adjust page orientation, and download your updated PDF instantly without installing software.",
+      "keywords": "Rotate PDF Document, Rotate PDF Doc, Rotate PDF Online, Free PDF Rotator, Rotate PDF Pages"
+    },
+    "/add-page-numbers/": {
+      "title": "Free Add Page Numbers to PDF Tool – Number PDF Pages Online",
+      "description": "Add page numbers to PDF documents online for free. Easily number PDF pages, customize number positions and formatting, and download your updated PDF instantly without installing software.",
+      "keywords": "Add Page Numbers to PDF, PDF Page Numbering, Number PDF Pages, Add Page Numbers Online, Free PDF Page Numbering Tool"
+    },
+    "/compress-pdf-to-kb/": {
+      "title": "Free Compress PDF to KB Tool – Reduce PDF File Size Online",
+      "description": "Compress PDF documents online for free and decrease PDF file size in KB without losing too much quality. Reduce large PDF files quickly and download your compressed PDF instantly.",
+      "keywords": "Compress PDF, Compress PDF Document, Decrease PDF File Size, Compress PDF to KB, Reduce PDF File Size"
+    },
+    "/resize-image-to-kb/": {
+      "title": "Free Image Resizer in KB – Reduce Photo Size Online",
+      "description": "Resize images in KB online for free with our easy-to-use photo resizer. Reduce photo file size, adjust image dimensions, and download smaller images quickly without installing software.",
+      "keywords": "Resize Image in KB, Photo Resizer in KB, Photo Size Reducer, Reduce Image Size in KB, Image Resizer Online"
+    },
+    "/signature-resize/": {
+      "title": "Free Signature Resizer Tool – Resize Signature to 10–20 KB Online",
+      "description": "Resize your signature image online for free. Easily compress and adjust signature size to 10–20 KB, meet document upload requirements, and download your resized signature instantly.",
+      "keywords": "Signature Resize, Signature Resize 10 to 20 KB, Signature Resize in KB, Resize Signature Online, Signature Image Resizer"
+    },
+    "/compress-pdf-to-100kb/": {
+      "title": "Free PDF Compressor to 100KB – Reduce PDF Size Online",
+      "description": "Convert PDF size to 100KB online for free with our easy-to-use PDF compressor. Reduce large PDF files to 100KB quickly while maintaining the best possible quality. Download your compressed PDF instantly.",
+      "keywords": "Convert PDF Size to 100KB, Compress PDF to 100KB, PDF Compressor to 100KB, Reduce PDF Size to 100KB, PDF Size Reducer"
+    },
+    "/compress-pdf-to-200kb/": {
+      "title": "Free PDF Compressor to 200KB – Reduce PDF Size Online",
+      "description": "Compress PDF to 200KB online for free with our easy-to-use PDF compressor. Reduce large PDF files to 200KB while maintaining the best possible quality. Download your compressed PDF instantly.",
+      "keywords": "Compress PDF to 200KB, Reduce PDF Size to 200KB, PDF Compressor to 200KB, Convert PDF Size to 200KB, Compress PDF Online"
+    },
+    "/compress-pdf-to-50kb/": {
+      "title": "Free PDF Compressor to 50KB – Reduce PDF Size Online",
+      "description": "Compress PDF to 50KB online for free with our easy-to-use PDF compressor. Reduce large PDF files to 50KB while maintaining the best possible quality. Download your compressed PDF instantly.",
+      "keywords": "Compress PDF to 50KB, Reduce PDF Size to 50KB, PDF Compressor to 50KB, Convert PDF Size to 50KB, Compress PDF Online"
+    },
+    "/resize-image-to-20kb/": {
+      "title": "Free Image Resizer to 20KB – Reduce Photo Size Online",
+      "description": "Resize images to 20KB online for free with our easy-to-use image resizer. Reduce photo file size to 20KB while maintaining the best possible image quality. Download your resized image instantly.",
+      "keywords": "Resize Image to 20KB, Image Resizer to 20KB, Reduce Photo Size to 20KB, Photo Size Reducer, Compress Image to 20KB"
+    },
+    "/resize-image-to-50kb/": {
+      "title": "Free Image Resizer to 50KB – Reduce Photo Size Online",
+      "description": "Resize images to 50KB online for free with our easy-to-use image resizer. Reduce photo file size to 50KB while maintaining the best possible image quality. Download your resized image instantly.",
+      "keywords": "Resize Image to 50KB, Image Resizer to 50KB, Reduce Photo Size to 50KB, Photo Size Reducer, Compress Image to 50KB"
+    },
+    "/privacy/": {
+      "title": "Privacy Policy – Your Data & Privacy Protection",
+      "description": "Read our Privacy Policy to understand how we collect, use, store, and protect your personal information when you use our free online PDF and image converter tools.",
+      "keywords": "Privacy Policy, Data Privacy Policy, User Privacy Protection, Personal Information Security, Online Tool Privacy Policy",
+      "noindex": true
+    },
+    "/terms/": {
+      "title": "Terms and Conditions – Rules for Using Our Online Tools",
+      "description": "Read our Terms and Conditions to understand the rules, responsibilities, limitations, and usage guidelines for using our free online PDF and image converter tools.",
+      "keywords": "Terms and Conditions, Terms of Service, Website Terms of Use, Online Tool Usage Policy, PDF Converter Terms",
+      "noindex": true
+    },
+    "/tools/": {
+      "title": "Free Online PDF & Image Tools – All-in-One Converter Tools",
+      "description": "Explore free online PDF and image tools in one place. Merge, split, compress, rotate PDFs, convert images to PDF, resize photos in KB, and more. Fast, easy, and free to use without installing software.",
+      "keywords": "Free Online Tools, PDF Tools, Image Tools, PDF Converter Tools, Online PDF and Image Tools",
+      "noindex": true
+    }
+  }
 }

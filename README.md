@@ -43,12 +43,12 @@ Same setup as dailygoldrateindia.com: **a push to `main` goes live, a push to `d
 
 ## Admin panel (`/admin/`)
 
-A password-protected page for editing, per page, the **meta title, meta description, heading (H1), extra text above the questions, FAQ** and whether the page is shown in Google. No code needed.
+A password-protected page for editing, per page, the **meta title, meta description, meta keywords, heading (H1), extra text above the questions, FAQ** and whether the page is shown in Google. No code needed.
 
 How it works: **Publish** commits `data/content.json` to GitHub (from the live site to `main`, from a preview to that preview's branch). Cloudflare rebuilds and the change is live in about 2 minutes. Every change is in the GitHub history, so any edit can be undone there.
 
 - Page addresses stay locked, so old links and rankings keep working. A page without a field edit keeps its default text from `src/site.mjs` / `src/pages.mjs`.
-- Titles (20 to 65 characters), descriptions (70 to 160), unique titles, a non-empty H1 and complete FAQ answers are checked in the admin and **again at build time**: if a bad edit reaches `data/content.json`, the build stops and the live site is unchanged.
+- Titles (20 to 65 characters), descriptions (70 to 160 recommended, the build only stops above 230), keywords (comma separated, up to 500 characters, optional), unique titles, a non-empty H1 and complete FAQ answers are checked in the admin and **again at build time**: if a bad edit reaches `data/content.json`, the build stops and the live site is unchanged.
 - Extra text allows headings, paragraphs, lists, bold, italic and links only (scripts and event handlers are stripped).
 - In the heading, `**two stars**` highlight words in blue (the home page uses this).
 - Files: `src/admin/` (the page), `functions/admin/api/[[path]].js` (Cloudflare Pages Function: login + save), `src/lib/content.mjs` (applies and validates edits), `data/content.json` (the saved edits, keyed by page address like `/merge-pdf/`).

@@ -1,16 +1,18 @@
 // Content edited in the admin panel (data/content.json) and applied at build time.
 //
-// data/content.json = { pages: { "/jpg-to-pdf/": { title?, description?, h1?, extra?, faq?: [{q, a}], noindex? } } }
+// data/content.json = { pages: { "/jpg-to-pdf/": { title?, description?, keywords?, h1?, extra?, faq?: [{q, a}], noindex? } } }
 // Keys are page addresses: "/" is the home page, every other page is "/<folder>/".
 // A field that is missing keeps the default written in src/site.mjs and src/pages.mjs.
 import { esc } from '../templates.mjs';
 
 export const EMPTY = { pages: {} };
-export const FIELDS = ['title', 'description', 'h1', 'extra', 'faq', 'noindex'];
+export const FIELDS = ['title', 'description', 'keywords', 'h1', 'extra', 'faq', 'noindex'];
 
 const ENT = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'" };
 const unesc = (s) => String(s).replace(/&(?:amp|lt|gt|quot|#39);/g, (m) => ENT[m]);
 export const cleanText = (s) => String(s || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+/** Meta keywords as one tidy comma-separated line (blank and repeated entries dropped). */
+export const cleanKeywords = (s) => [...new Set(cleanText(s).split(/[,;\n]/).map((k) => k.trim()).filter(Boolean))].join(', ');
 
 /** Keep owner-written HTML to simple text tags; drop scripts, styles, event handlers and javascript: links. */
 export function cleanHtml(html) {
@@ -45,7 +47,7 @@ export function defaultsOf(def) {
   const body = def.body || '';
   const faq = faqOf(def.jsonld);
   return {
-    title: def.page.title, description: def.page.desc, h1: h1Text(body), faq,
+    title: def.page.title, description: def.page.desc, keywords: def.page.keywords || '', h1: h1Text(body), faq,
     hasFaq: FAQ_RUN_RE.test(body), h1Editable: H1_RE.test(body) && !/data-g-q/.test(body)
   };
 }
@@ -57,6 +59,7 @@ export function applyPage(def, ov = {}) {
   const d = defaultsOf(def);
   if (ov.title && cleanText(ov.title)) out.page.title = cleanText(ov.title);
   if (ov.description && cleanText(ov.description)) out.page.desc = cleanText(ov.description);
+  if (ov.keywords !== undefined) { const k = cleanKeywords(ov.keywords); if (k) out.page.keywords = k; }
   if (ov.noindex) out.noindex = true;
   if (ov.h1 && cleanText(ov.h1) && d.h1Editable) body = body.replace(H1_RE, (m, attrs) => `<h1${attrs || ''}>${h1Html(cleanText(ov.h1))}</h1>`);
   if (Array.isArray(ov.faq) && ov.faq.length && d.hasFaq) {
@@ -93,7 +96,8 @@ export function validateContent(content, pages) {
     for (const k of Object.keys(ov)) if (!FIELDS.includes(k)) problems.push(`${path}: unknown field "${k}"`);
     const t = titleOf(p), d = descOf(p), n = (s) => [...s].length;
     if (ov.title !== undefined && (n(t) < 20 || n(t) > 78)) problems.push(`${path}: title is ${n(t)} characters, keep it between 20 and 65`);
-    if (ov.description !== undefined && (n(d) < 70 || n(d) > 175)) problems.push(`${path}: description is ${n(d)} characters, keep it between 70 and 160`);
+    if (ov.description !== undefined && (n(d) < 70 || n(d) > 230)) problems.push(`${path}: description is ${n(d)} characters, keep it between 70 and 160 (Google cuts longer ones)`);
+    if (ov.keywords !== undefined && (typeof ov.keywords !== 'string' || n(cleanKeywords(ov.keywords)) > 500)) problems.push(`${path}: keywords must be text under 500 characters`);
     if ((ov.title !== undefined || ov.description !== undefined) && pages.some((q) => q !== p && ((ov.title !== undefined && titleOf(q) === t) || (ov.description !== undefined && descOf(q) === d)))) problems.push(`${path}: title or description is the same as another page`);
     if (ov.h1 !== undefined && !cleanText(ov.h1)) problems.push(`${path}: the H1 heading is empty`);
     if (ov.faq !== undefined && (!Array.isArray(ov.faq) || ov.faq.some((f) => !f || !cleanText(f.q) || !cleanText(f.a)))) problems.push(`${path}: every FAQ question needs an answer`);
