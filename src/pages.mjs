@@ -98,12 +98,6 @@ export function homePage(rel) {
       <span class="pill">${ICON.shield}Free · Private · No sign-up</span>
       <h1>Every PDF tool you need. <span class="hl">Right on your phone.</span></h1>
       <p class="lead">Convert, compress to exact KB, merge and more. Everything runs on your device, so your files never get uploaded.</p>
-      <form class="searchbar" action="${rel}tools/" method="get" role="search">
-        ${ICON.search}
-        <label class="sr-only" for="home-q">Search tools</label>
-        <input id="home-q" name="q" type="search" placeholder="Search tools, e.g. 100 KB" autocomplete="off">
-        <button class="btn btn-primary" type="submit">Find</button>
-      </form>
       <div class="chips popular"><span class="muted">Popular:</span><a class="chip" href="${rel}jpg-to-pdf/">JPG to PDF</a><a class="chip" href="${rel}compress-pdf-to-100kb/">Compress to 100 KB</a><a class="chip" href="${rel}merge-pdf/">Merge PDF</a></div>
       <ul class="checks"><li>${ICON.check}Free forever</li><li>${ICON.check}No watermark</li><li>${ICON.check}No daily limit</li></ul>
     </div>

@@ -369,7 +369,7 @@ const noErrors = (page) => assert(!page._errors.length, 'console errors: ' + pag
     await ctx.close();
   });
 
-  await test('Home: exam tabs, quick-start tabs, search to tools', async () => {
+  await test('Home: exam tabs, quick-start tabs', async () => {
     const { ctx, page } = await newPage();
     await page.goto(BASE);
     await page.locator('[data-exams]').getByRole('tab', { name: 'UPSC' }).click();
@@ -378,11 +378,7 @@ const noErrors = (page) => assert(!page._errors.length, 'console errors: ' + pag
     assert((await vis.locator('a').first().getAttribute('href')).includes('compress-pdf-to-kb/?target=300'), 'fix link');
     await page.locator('[data-quick]').getByRole('tab', { name: 'Compress to KB' }).click();
     assert((await page.locator('[data-q-btn]').getAttribute('href')).includes('compress-pdf-to-kb'), 'quick link');
-    await page.fill('#home-q', '100 kb');
-    await page.press('#home-q', 'Enter');
-    await page.waitForURL(/tools\/\?q=/);
-    const visible = await page.locator('.tool-group a.tile:visible .tile-name').allTextContents();
-    assert(visible.includes('Compress PDF to KB') && !visible.includes('JPG to PDF'), 'filter ' + visible);
+    assert((await page.locator('#home-q').count()) === 0, 'home search bar removed');
     noErrors(page);
     await ctx.close();
   });
