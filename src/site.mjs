@@ -171,7 +171,7 @@ export const TOOL_PAGES = [
     steps: ['Tap <strong>Select PDF</strong>.', 'Pick the target size, like 100 KB, or type your own.', 'Check the preview is readable, then download.'],
     features: [['Exact size', 'Always under the limit you pick.'], ['Readable check', 'Preview the pages before downloading.'], ['Black and white option', 'Makes scanned pages much smaller.']],
     faq: [{ q: 'Will the portal accept it?', a: 'We show the exact size before you download. Portals reject files even 1 KB over, so we always stay below your limit.' }, { q: 'Why does text look soft at 50 KB?', a: 'Very small sizes need lower resolution. If your form allows it, pick a bigger size or keep fewer pages.' }, { q: 'Can I still copy text from the compressed PDF?', a: 'When we have to shrink a lot, pages are saved as images, so text cannot be selected. Light compression keeps text when possible.' }, PRIVACY_FAQ],
-    related: ['resize-image-to-kb', 'signature-resize', 'merge-pdf']
+    related: ['resize-image-to-kb', 'signature-resize', 'merge-pdf', 'compress-pdf-to-300kb', 'compress-pdf-to-500kb']
   },
   {
     slug: 'compress-pdf', engine: 'compress', cat: 'optimize',
@@ -195,7 +195,7 @@ export const TOOL_PAGES = [
     steps: ['Tap <strong>Select photo</strong> or take one.', 'Pick a preset like 20 to 50 KB, or type your own range.', 'Download the JPG and upload it to the form.'],
     features: [['Min and max KB', 'Many forms reject files that are too small too.'], ['Optional size in pixels', 'Set width and height if the form asks.'], ['JPG output', 'The format every portal accepts.']],
     faq: [{ q: 'My form says 20 to 50 KB. What do I pick?', a: 'Choose the 20 to 50 KB preset. We aim near the top of the range for the best quality.' }, { q: 'Can I set pixel size too?', a: 'Yes. Type the width and height in pixels if your notice gives them.' }, PRIVACY_FAQ],
-    related: ['signature-resize', 'compress-pdf-to-kb', 'jpg-to-pdf']
+    related: ['signature-resize', 'compress-pdf-to-kb', 'jpg-to-pdf', 'resize-image-to-100kb']
   },
   {
     slug: 'signature-resize', engine: 'resize', cat: 'optimize',
