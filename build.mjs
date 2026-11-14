@@ -81,7 +81,7 @@ const adminPages = [];
 for (const q of queue) {
   const ov = q.file === '404.html' ? {} : content.pages[q.path] || {};
   const def = applyPage(q.def, ov);
-  const html = layout({ ...def, rel: q.rel, assetV, indexing: INDEXING && !def.noindex });
+  const html = layout({ ...def, rel: q.rel, assetV, indexing: INDEXING && !def.noindex, siteIndexing: INDEXING });
   write(q.file, html);
   pages.push({ file: q.file, path: def.page.path, noindex: !!def.noindex });
   if (q.file !== '404.html') adminPages.push({ path: q.path, defaults: defaultsOf(q.def), override: ov, inSitemap: INDEXING && !def.noindex });
@@ -148,7 +148,11 @@ write('robots.txt', INDEXING ? `User-agent: *\nAllow: /\nDisallow: /recent/\nDis
 copy(path.join(SRC, 'assets/img/favicon.ico'), path.join(DIST, 'favicon.ico'));
 write('.nojekyll', '');
 // Security headers for Cloudflare Pages / Netlify (GitHub Pages ignores this file).
-write('_headers', `/admin/*
+write('_headers', `https://:project.pages.dev/*
+  X-Robots-Tag: noindex, nofollow
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex, nofollow
+/admin/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
 /*

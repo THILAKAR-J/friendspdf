@@ -115,9 +115,10 @@ export function breadcrumbs(items, rel) {
   return `<nav class="crumbs" aria-label="Breadcrumb"><ol>${items.map(([label, href], i) => i === items.length - 1 ? `<li aria-current="page">${esc(label)}</li>` : `<li><a href="${rel}${href}">${esc(label)}</a></li>`).join('')}</ol></nav>`;
 }
 
-export function layout({ page, rel, body, active, tab, scripts = [], jsonld = [], indexing, assetV, bodyClass = '' }) {
+export function layout({ page, rel, body, active, tab, scripts = [], jsonld = [], indexing, siteIndexing = indexing, assetV, bodyClass = '' }) {
   const canonical = SITE.url + '/' + (page.path || '');
-  const robots = indexing ? 'index, follow, max-image-preview:large' : 'noindex, nofollow';
+  // Live site: a hidden page is still crawled for its links (noindex, follow). Previews: hidden completely.
+  const robots = indexing ? 'index, follow, max-image-preview:large' : siteIndexing ? 'noindex, follow' : 'noindex, nofollow';
   const ld = jsonld.map((o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`).join('\n');
   const scr = ['assets/js/app.js', ...scripts].map((s) => `<script type="module" src="${rel}${s}?v=${assetV}"></script>`).join('\n');
   return `<!doctype html>

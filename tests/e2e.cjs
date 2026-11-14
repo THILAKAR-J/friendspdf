@@ -414,7 +414,7 @@ const noErrors = (page) => assert(!page._errors.length, 'console errors: ' + pag
     const sitemap = await (await fetch(BASE + 'sitemap.xml')).text();
     const urls = [...sitemap.matchAll(/<loc>https:\/\/friendspdf\.com\/(.*?)<\/loc>/g)].map((m) => m[1]);
     assert(urls.length >= 22, 'sitemap urls ' + urls.length);
-    const hidden = ['recent/', 'privacy/', 'terms/', 'tools/']; // noindex pages: not in the sitemap, still crawled
+    const hidden = ['recent/', 'privacy/', 'terms/']; // noindex pages: not in the sitemap, still crawled
     assert(!urls.some((u) => hidden.includes(u)), 'noindex pages must not be in the sitemap');
     const all = [...urls, ...hidden];
     const titles = new Map(), descs = new Map();
@@ -448,6 +448,7 @@ const noErrors = (page) => assert(!page._errors.length, 'console errors: ' + pag
           if (m.lang !== 'en') issues.push(`${u} lang`);
           if (!hidden.includes(u) && !/^index/.test(m.robots)) issues.push(`${u} robots ${m.robots}`);
           if (hidden.includes(u) && !/noindex/.test(m.robots)) issues.push(`${u} should be noindex`);
+          if (u !== 'recent/' && hidden.includes(u) && !/noindex, follow/.test(m.robots)) issues.push(`${u} should be noindex, follow`);
           if (u === 'merge-pdf/' && !/^Merge PDF,/.test(m.keywords || '')) issues.push('merge-pdf meta keywords missing');
           if (!m.og) issues.push(`${u} og tags`);
           if (m.ld.some((x) => !x)) issues.push(`${u} invalid JSON-LD`);
